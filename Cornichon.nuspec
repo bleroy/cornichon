@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Cornichon</id>
+        <version>0.1.0</version>
+        <title>Cornichon</title>
+        <authors>bleroy</authors>
+        <licenseUrl>https://github.com/bleroy/cornichon/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/bleroy/cornichon</projectUrl>
+        <iconUrl>https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Pickle_%281%29.jpg/1920px-Pickle_%281%29.jpg</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A super-simple library to write tests in C#, using a syntax that looks as much like Gherkin as possible, while remaining C#, and without having to deal with nasty regular expressions. That's less pretty than the Gherkin natural language, but it also reduces the need for special tooling, in particular for debugging.
+
+The second goal of Cornichon is to be Core-compatible. It also has no dependencies other than .NET itself.</description>
+        <summary>A minimalist library to write Gherkin-style scenarios, but in C#. No dependencies, runs on .NET Core.</summary>
+        <copyright>(c) 2016 Bertrand Le Roy</copyright>
+        <language>en-US</language>
+        <tags>Gherkin, Spec, Test</tags>
+    </metadata>
+    <files>
+        <file src="bin\Release\Cornichon.dll" target="lib\Cornichon.dll" />
+    </files>
+</package>
