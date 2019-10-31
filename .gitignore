@@ -2,3 +2,5 @@
 obj
 project.lock.json
 bin
+Properties/PublishProfiles
+*.user
