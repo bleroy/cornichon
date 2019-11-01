@@ -36,7 +36,7 @@ automatically within the context of your test method:
 public class RefundItem
 {
     [Fact]
-    public void CreateDirectoryCreatesDirectory()
+    public void CustomerReturningProductsCausesRefund()
     {
         var jeff = new Customer
         {
@@ -77,16 +77,13 @@ public class TestCustomer
     public Customer Customer { get; }
     public Order Order { get; set; }
 
-    public Purchase BoughtA(string product) {
+    public Purchase bought_a(string product) {
         return new Purchase(product, this);
     }
 
-    public void HasAReceipt()
-    {
-        Customer.Receipts.Add(Order.Receipt);
-    }
+    public void has_a_receipt() => Customer.Receipts.Add(Order.Receipt);
 
-    public void ReturnsThe(string productName)
+    public void returns_the(string productName)
     {
         if (Order != null)
         {
@@ -98,10 +95,7 @@ public class TestCustomer
         }
     }
 
-    public void ShouldHave(double amount)
-    {
-        Assert.Equal(amount, Customer.Balance);
-    }
+    public void should_have(double amount) => Assert.Equal(amount, Customer.Balance);
 
     public class Purchase
     {
@@ -114,10 +108,8 @@ public class TestCustomer
             _customerTestHelper = customerTestHelper;
         }
 
-        public void For(double price)
-        {
-            _customerTestHelper.Order = new Order(new Product(_product, price));
-        }
+        public void for(double price)
+            => _customerTestHelper.Order = new Order(new Product(_product, price));
     }
 }
 ```
@@ -131,15 +123,15 @@ Then we can use that class to rewrite our test in a much more readable way:
 public class RefundItem
 {
     [Fact]
-    public void CreateDirectoryCreatesDirectory()
+    public void CustomerReturningProductsCausesRefund()
     {
         var jeff = new TestCustomer();
 
         new Scenario("Jeff returns a faulty microwave.")
-            .Given(() => { jeff.BoughtA("microwave").For(100); })
-            .And(() => { jeff.HasAReceipt(); })
-            .When(() => { jeff.ReturnsThe("microwave"); })
-            .Then(() => { jeff.ShouldHave(100); });
+            .Given(() => { jeff.bought_a("microwave").for(100); })
+            .And(()   => { jeff.has_a_receipt(); })
+            .When(()  => { jeff.returns_the("microwave"); })
+            .Then(()  => { jeff.should_have(100); });
     }
 }
 ```
