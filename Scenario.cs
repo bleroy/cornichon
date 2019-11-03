@@ -4,17 +4,13 @@ namespace Cornichon
 {
     public class Scenario
     {
-        public Scenario(string description)
-        {
-            Description = description;
-        }
+        private Scenario()
+        { }
 
-        public string Description { get; set; }
-
-        public Scenario Given(Action axiom)
+        public static Scenario Given(Action axiom)
         {
             axiom.Invoke();
-            return this;
+            return new Scenario();
         }
 
         public Scenario And(Action additionalStepOrAssertion)

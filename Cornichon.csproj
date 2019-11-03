@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Bertrand Le Roy</Authors>
     <Company>Decent Consulting</Company>
     <Description>A super-simple library to write tests in C#, using a syntax that looks as much like Gherkin as possible.</Description>

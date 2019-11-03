@@ -44,11 +44,11 @@ public class RefundItem
         };
         var order = new Order(new Product("microwave", 100));
 
-        new Scenario("Jeff returns a faulty microwave.")
+        Scenario
             .Given(() => { jeff.Orders.Add(order); })
-            .And(() => { jeff.Receipts.Add(order.Receipt); })
-            .When(() => { jeff.Return(order.Products[0]); })
-            .Then(() => { Assert.Equal(100, jeff.Balance); });
+              .And(() => { jeff.Receipts.Add(order.Receipt); })
+             .When(() => { jeff.Return(order.Products[0]); })
+             .Then(() => { Assert.Equal(100, jeff.Balance); });
     }
 }
 ```
@@ -122,16 +122,14 @@ Then we can use that class to rewrite our test in a much more readable way:
 /// </summary>
 public class RefundItem
 {
+    private readonly TestCustomer jeff = new TestCustomer();
+
     [Fact]
     public void CustomerReturningProductsCausesRefund()
-    {
-        var jeff = new TestCustomer();
-
-        new Scenario("Jeff returns a faulty microwave.")
+        => Scenario
             .Given(() => { jeff.bought_a("microwave").for(100); })
-            .And(()   => { jeff.has_a_receipt(); })
-            .When(()  => { jeff.returns_the("microwave"); })
-            .Then(()  => { jeff.should_have(100); });
-    }
+              .And(() => { jeff.has_a_receipt(); })
+             .When(() => { jeff.returns_the("microwave"); })
+             .Then(() => { jeff.should_have(100); });
 }
 ```
