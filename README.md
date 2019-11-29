@@ -4,6 +4,15 @@
 A super-simple library to write tests in C#, using a syntax that looks as much like
 [Gherkin](https://cucumber.io/docs/reference) as possible, while remaining C#, and
 without having to deal with nasty regular expressions.
+
+```csharp
+Scenario
+    .Given(() => { jeff.bought_a("microwave").at(100); })
+      .And(() => { jeff.has_a_receipt(); })
+     .When(() => { jeff.returns_the("microwave"); })
+     .Then(() => { jeff.should_have(100); });
+```
+
 That's less pretty than the Gherkin natural language, but it also reduces the need for
 special tooling, in particular for debugging.
 
@@ -61,10 +70,10 @@ after the Gherkin keywords.
 That code typically implements user actions that can then be used to construct scenarios.
 This is no different, so let's refactor the code above.
 
-First, we'll implement a test customer that implements possible customer actions:
+First, we'll implement a test customer helper that implements possible customer actions:
 
 ```csharp
-public class TestCustomer
+public class CustomerTestHelper
 {
     public CustomerTestHelper()
     {
@@ -77,7 +86,8 @@ public class TestCustomer
     public Customer Customer { get; }
     public Order Order { get; set; }
 
-    public Purchase bought_a(string product) {
+    public Purchase bought_a(string product)
+    {
         return new Purchase(product, this);
     }
 
@@ -95,7 +105,7 @@ public class TestCustomer
         }
     }
 
-    public void should_have(double amount) => Assert.Equal(amount, Customer.Balance);
+    public void should_have(decimal amount) => Assert.Equal(amount, Customer.Balance);
 
     public class Purchase
     {
@@ -108,7 +118,7 @@ public class TestCustomer
             _customerTestHelper = customerTestHelper;
         }
 
-        public void for(double price)
+        public void at(decimal price)
             => _customerTestHelper.Order = new Order(new Product(_product, price));
     }
 }
@@ -127,9 +137,54 @@ public class RefundItem
     [Fact]
     public void CustomerReturningProductsCausesRefund()
         => Scenario
-            .Given(() => { jeff.bought_a("microwave").for(100); })
+            .Given(() => { jeff.bought_a("microwave").at(100); })
               .And(() => { jeff.has_a_receipt(); })
              .When(() => { jeff.returns_the("microwave"); })
              .Then(() => { jeff.should_have(100); });
 }
+```
+
+### Asynchronous tests
+
+Since version 3.0.0, Cornichon allows for asynchronous actions.
+Tests can still be run synchronously as before, using the same syntax, but it is
+also possible to use asynchronous Lambdas to run tests asynchronously.
+The scenario steps are run sequentially, and the results of the previous steps are
+awaited before the next one is run.
+It is possible to use a mix of synchronous and asynchronous steps.
+
+If the `CustomerTestHelper` class is modified to have an asynchronous method:
+
+
+```csharp
+public async Task asynchronously_returns_the(string productName)
+{
+    if (Order != null)
+    {
+        Product product = await Order.FetchProductAsync(productName);
+        if (product != null)
+        {
+            await Customer.ReturnAsync(product);
+        }
+    }
+}
+```
+
+And `CustomerTestHelper.Purchase` also gets one:
+
+```csharp
+public async Task asynchronously_for(decimal price)
+    => _customerTestHelper.Order = await Order.CreateAsync(new Product(_product, price));
+```
+
+Then the scenario can be run asynchronously as well:
+
+```csharp
+[Fact]
+public async Task AsynchronousCustomerReturningProductsCausesRefund()
+    => await Scenario
+        .Given(async () => { await jeff.bought_a("microwave").asynchronously_for(100); })
+          .And(      () => {       jeff.has_a_receipt(); })
+         .When(async () => { await jeff.asynchronously_returns_the("microwave"); })
+         .Then(      () => {       jeff.should_have(100); });
 ```
