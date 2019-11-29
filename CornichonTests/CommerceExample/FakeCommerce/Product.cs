@@ -11,5 +11,10 @@
         public string Name { get; }
         
         public decimal Price { get; }
+
+        public override bool Equals(object obj)
+            => obj is Product p ? p.Name == Name && p.Price == Price : false;
+
+        public override int GetHashCode() => (Name, Price).GetHashCode();
     }
 }

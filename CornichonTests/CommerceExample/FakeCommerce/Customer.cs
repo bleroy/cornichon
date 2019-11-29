@@ -1,5 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Cornichon.Tests.CommerceExample.FakeCommerce
@@ -12,13 +13,17 @@ namespace Cornichon.Tests.CommerceExample.FakeCommerce
 
         public void Return(Product product)
         {
+            if (!Receipts.Any(receipt => receipt.Order.Products.Contains(product)))
+            {
+                throw new InvalidOperationException($"Customer doesn't have a receipt for the product {product.Name}.");
+            }
             Balance += product.Price;
         }
 
         public async Task ReturnAsync(Product product)
         {
             await Task.Delay(10); // Simulate some latency
-            Balance += product.Price;
+            Return(product);
         }
     }
 }

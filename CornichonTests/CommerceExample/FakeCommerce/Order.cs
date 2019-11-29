@@ -20,7 +20,7 @@ namespace Cornichon.Tests.CommerceExample.FakeCommerce
 
         public IList<Product> Products => ProductQuantities.Select(pq => pq.Product).ToList();
 
-        public Receipt Receipt { get; set; }
+        public Receipt Receipt => new Receipt(this);
 
         public async Task<Product> FetchProductAsync(string name)
         {
