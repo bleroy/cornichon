@@ -1,34 +1,65 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Cornichon
 {
-    public class Scenario
+    public class Scenario : INotifyCompletion
     {
-        private Scenario()
-        { }
+        private Task _task;
 
-        public static Scenario Given(Action axiom)
+        private Scenario() {}
+
+        private Scenario(Func<Task> taskFactory)
         {
-            axiom.Invoke();
-            return new Scenario();
+            _task = taskFactory();
         }
 
-        public Scenario And(Action additionalStepOrAssertion)
+        public Scenario GetAwaiter() => this;
+
+        public bool IsCompleted => _task?.IsCompleted ?? true;
+
+        void INotifyCompletion.OnCompleted(Action continuation)
         {
-            additionalStepOrAssertion.Invoke();
+            if (_task is null)
+            {
+                continuation();
+            }
+            else
+            {
+                _task.ContinueWith(antecedent => continuation());
+            }
+        }
+
+        public Scenario GetResult()
+        {
+            _task?.Wait();
             return this;
         }
 
-        public Scenario When(Action step)
-        {
-            step.Invoke();
-            return this;
-        }
+        public static Scenario Given(Action axiom) => new Scenario().Then(axiom);
+
+        public static Scenario Given(Func<Task> axiomTask) => new Scenario().Then(axiomTask);
+
+        public Scenario And(Action additionalStepOrAssertion) => Then(additionalStepOrAssertion);
+
+        public Scenario And(Func<Task> additionalStepOrAssertionTask) => Then(additionalStepOrAssertionTask);
+
+        public Scenario When(Action step) => Then(step);
+
+        public Scenario When(Func<Task> step) => Then(step);
 
         public Scenario Then(Action assertion)
         {
-            assertion.Invoke();
-            return this;
+            _task?.Wait();
+            assertion();
+            return new Scenario();
+        }
+
+        public Scenario Then(Func<Task> assertionTask)
+        {
+            _task?.Wait();
+            return new Scenario(assertionTask);
         }
     }
 }
