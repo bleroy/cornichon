@@ -10,31 +10,38 @@ namespace Cornichon
 
         private Scenario() {}
 
-        private Scenario(Func<Task> taskFactory)
-        {
-            _task = taskFactory();
-        }
-
         public Scenario GetAwaiter() => this;
 
         public bool IsCompleted => _task?.IsCompleted ?? true;
 
-        void INotifyCompletion.OnCompleted(Action continuation)
+        void INotifyCompletion.OnCompleted(Action continuation) => Queue(continuation);
+
+        public Scenario GetResult() => this;
+
+        private void Queue(Action continuation)
         {
             if (_task is null)
             {
                 continuation();
+                return;
             }
-            else
-            {
-                _task.ContinueWith(antecedent => continuation());
-            }
+            Queue(() => Task.Run(continuation));
         }
 
-        public Scenario GetResult()
+        private void Queue(Func<Task> taskFactory)
         {
-            _task?.Wait();
-            return this;
+            if (_task is null)
+            {
+                _task = taskFactory();
+                return;
+            }
+            // Capture the previous task in the closure
+            Task antecedent = _task;
+            _task = Task.Run(async () =>
+            {
+                await antecedent;
+                await taskFactory();
+            });
         }
 
         public static Scenario Given(Action axiom) => new Scenario().Then(axiom);
@@ -51,15 +58,14 @@ namespace Cornichon
 
         public Scenario Then(Action assertion)
         {
-            _task?.Wait();
-            assertion();
-            return new Scenario();
+            Queue(assertion);
+            return this;
         }
 
         public Scenario Then(Func<Task> assertionTask)
         {
-            _task?.Wait();
-            return new Scenario(assertionTask);
+            Queue(assertionTask);
+            return this;
         }
     }
 }

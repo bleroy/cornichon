@@ -26,9 +26,9 @@ namespace Cornichon.Tests
             var sequence = new List<int> { 0 };
             Scenario
                 .Given(() => sequence.Add(1))
-                .And(() => sequence.Add(2))
-                .When(() => sequence.Add(3))
-                .Then(() => sequence.Add(4));
+                  .And(() => sequence.Add(2))
+                 .When(() => sequence.Add(3))
+                 .Then(() => sequence.Add(4));
             sequence.Add(5);
             Assert.Equal(new[] { 0, 1, 2, 3, 4, 5 }, sequence);
         }
@@ -52,20 +52,6 @@ namespace Cornichon.Tests
                 });
             sequence.Add(5);
             Assert.Equal(new[] { 0, 1, 2, 3, 4, 5 }, sequence);
-        }
-
-        [Fact]
-        public void GetResultStopsExecutionCleanly()
-        {
-            var sequence = new List<int> { 0 };
-            Scenario.Given(async () =>
-            {
-                sequence.Add(1);
-                await Task.Delay(200);
-                sequence.Add(2);
-            }).GetResult();
-            sequence.Add(3);
-            Assert.Equal(new[] { 0, 1, 2, 3 }, sequence);
         }
     }
 }

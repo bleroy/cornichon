@@ -29,7 +29,7 @@ namespace Cornichon.Tests.CommerceExample
         {
             if (Order != null)
             {
-                Product product = Order.Products.FirstOrDefault(product => product.Name == productName);
+                Product product = Order.Products.FirstOrDefault(p => p.Name == productName);
                 if (product != null)
                 {
                     Customer.Return(product);
