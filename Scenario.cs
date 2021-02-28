@@ -39,22 +39,22 @@ namespace Cornichon
             Task antecedent = _task;
             _task = Task.Run(async () =>
             {
-                await antecedent;
-                await taskFactory();
+                await antecedent.ConfigureAwait(false);
+                await taskFactory().ConfigureAwait(false);
             });
         }
 
         public static Scenario Given(Action axiom) => new Scenario().Then(axiom);
 
-        public static Scenario Given(Func<Task> axiomTask) => new Scenario().Then(axiomTask);
+        public static Scenario Given(Func<ValueTask> axiomTask) => new Scenario().Then(() => axiomTask().AsTask());
 
         public Scenario And(Action additionalStepOrAssertion) => Then(additionalStepOrAssertion);
 
-        public Scenario And(Func<Task> additionalStepOrAssertionTask) => Then(additionalStepOrAssertionTask);
+        public Scenario And(Func<ValueTask> additionalStepOrAssertionTask) => Then(() => additionalStepOrAssertionTask().AsTask());
 
         public Scenario When(Action step) => Then(step);
 
-        public Scenario When(Func<Task> step) => Then(step);
+        public Scenario When(Func<ValueTask> step) => Then(() => step().AsTask());
 
         public Scenario Then(Action assertion)
         {
@@ -62,10 +62,12 @@ namespace Cornichon
             return this;
         }
 
-        public Scenario Then(Func<Task> assertionTask)
+        private Scenario Then(Func<Task> assertionTask)
         {
             Queue(assertionTask);
             return this;
         }
+
+        public Scenario Then(Func<ValueTask> assertionTask) => Then(() => assertionTask().AsTask());
     }
 }

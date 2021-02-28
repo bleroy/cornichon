@@ -37,7 +37,7 @@ namespace Cornichon.Tests.CommerceExample
             }
         }
 
-        public async Task asynchronously_returns_the(string productName)
+        public async ValueTask asynchronously_returns_the(string productName)
         {
             if (Order != null)
             {
@@ -65,7 +65,7 @@ namespace Cornichon.Tests.CommerceExample
             public void at(decimal price)
                 => _customerTestHelper.Order = new Order(new Product(_product, price));
 
-            public async Task asynchronously_for(decimal price)
+            public async ValueTask asynchronously_for(decimal price)
                 => _customerTestHelper.Order = await Order.CreateAsync(new Product(_product, price));
         }
     }
