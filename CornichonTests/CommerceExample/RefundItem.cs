@@ -36,7 +36,7 @@ namespace Cornichon.Tests.CommerceExample
                  .Then(() => { jeff.should_have(100); });
 
         [Fact]
-        public async Task AsynchronousCustomerReturningProductsCausesRefund()
+        public async ValueTask AsynchronousCustomerReturningProductsCausesRefund()
             => await Scenario
                 .Given(async () => { await jeff.bought_a("microwave").asynchronously_for(100); })
                   .And(      () => {       jeff.has_a_receipt(); })

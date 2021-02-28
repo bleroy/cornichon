@@ -7,7 +7,7 @@ namespace Cornichon.Tests
     public class CornichonTests
     {
         [Fact]
-        public async void CanAwaitAsyncScenario()
+        public async ValueTask CanAwaitAsyncScenario()
         {
             var sequence = new List<int> { 0 };
             await Scenario.Given(async () =>
@@ -34,7 +34,7 @@ namespace Cornichon.Tests
         }
 
         [Fact]
-        public async void CanRunMixedScenarioOfAsyncAndSync()
+        public async ValueTask CanRunMixedScenarioOfAsyncAndSync()
         {
             var sequence = new List<int> { 0 };
             await Scenario

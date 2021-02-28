@@ -16,8 +16,7 @@ Scenario
 That's less pretty than the Gherkin natural language, but it also reduces the need for
 special tooling, in particular for debugging.
 
-The second goal of Cornichon is to be Core-compatible.
-It also has no dependencies other than .NET itself.
+The second goal of Cornichon is to be NetStandard 2.0 with no dependencies other than .NET itself.
 
 Implementation
 --------------
@@ -157,7 +156,7 @@ If the `CustomerTestHelper` class is modified to have an asynchronous method:
 
 
 ```csharp
-public async Task asynchronously_returns_the(string productName)
+public async ValueTask asynchronously_returns_the(string productName)
 {
     if (Order != null)
     {
@@ -173,7 +172,7 @@ public async Task asynchronously_returns_the(string productName)
 And `CustomerTestHelper.Purchase` also gets one:
 
 ```csharp
-public async Task asynchronously_for(decimal price)
+public async ValueTask asynchronously_for(decimal price)
     => _customerTestHelper.Order = await Order.CreateAsync(new Product(_product, price));
 ```
 
@@ -181,7 +180,7 @@ Then the scenario can be run asynchronously as well:
 
 ```csharp
 [Fact]
-public async Task AsynchronousCustomerReturningProductsCausesRefund()
+public async ValueTask AsynchronousCustomerReturningProductsCausesRefund()
     => await Scenario
         .Given(async () => { await jeff.bought_a("microwave").asynchronously_for(100); })
           .And(      () => {       jeff.has_a_receipt(); })
